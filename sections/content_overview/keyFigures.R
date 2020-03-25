@@ -4,7 +4,7 @@ sumData <- function(date) {
       confirmed = sum(confirmed),
       recovered = sum(recovered),
       deceased  = sum(deceased),
-      countries = n_distinct(`Country/Region`)
+      countries = n_distinct(`State`)
     )
     return(data)
   }

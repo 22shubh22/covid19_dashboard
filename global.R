@@ -51,17 +51,17 @@ changed_date <- file_info("data/covid19_data.zip")$change_time
 # Get evolution data by country
 data_confirmed_sub <- data_confirmed %>%
   pivot_longer(names_to = "date", cols = 5:ncol(data_confirmed)) %>%
-  group_by(`Province/State`, `Country/Region`, date, Lat, Long) %>%
+  group_by(`District`, `State`, date, Lat, Long) %>%
   summarise("confirmed" = sum(value))
 
 data_recovered_sub <- data_recovered %>%
   pivot_longer(names_to = "date", cols = 5:ncol(data_recovered)) %>%
-  group_by(`Province/State`, `Country/Region`, date, Lat, Long) %>%
+  group_by(`District`, `State`, date, Lat, Long) %>%
   summarise("recovered" = sum(value))
 
 data_deceased_sub <- data_deceased %>%
   pivot_longer(names_to = "date", cols = 5:ncol(data_deceased)) %>%
-  group_by(`Province/State`, `Country/Region`, date, Lat, Long) %>%
+  group_by(`District`, `State`, date, Lat, Long) %>%
   summarise("deceased" = sum(value))
 
 data_evolution      <- data_confirmed_sub %>%
@@ -75,13 +75,13 @@ data_evolution$date <- as.Date(data_evolution$date, "%m/%d/%y")
 # Calculating new cases
 data_evolution <- data_evolution %>%
   arrange(date) %>%
-  group_by(`Province/State`, `Country/Region`) %>%
+  group_by(`District`, `State`) %>%
   mutate(value_new = value - lag(value, 4, default = 0)) %>%
   ungroup()
 
 data_atDate <- function(inputDate) {
   data_evolution[which(data_evolution$date == inputDate),] %>%
-    pivot_wider(id_cols = c("Province/State", "Country/Region", "date", "Lat", "Long", "population"), names_from = var, values_from = value) %>%
+    pivot_wider(id_cols = c("District", "State", "date", "Lat", "Long", "population"), names_from = var, values_from = value) %>%
     filter(confirmed > 0 |
       recovered > 0 |
       deceased > 0 |
@@ -110,16 +110,16 @@ noDataCountries <- data.frame(
 population      <- bind_rows(population, noDataCountries)
 
 data_evolution <- data_evolution %>%
-  left_join(population, by = c("Country/Region" = "country"))
+  left_join(population, by = c("State" = "country"))
 rm(population, countryNamesPop, countryNamesDat, noDataCountries)
 
 data_latest <- data_atDate(max(data_evolution$date))
 
 top5_countries <- data_evolution %>%
   filter(var == "active", date == current_date) %>%
-  group_by(`Country/Region`) %>%
+  group_by(`State`) %>%
   summarise(value = sum(value)) %>%
   arrange(desc(value)) %>%
   top_n(5) %>%
-  select(`Country/Region`) %>%
+  select(`State`) %>%
   pull()

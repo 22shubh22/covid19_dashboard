@@ -31,7 +31,7 @@ output$selectize_casesByCountries <- renderUI({
   selectizeInput(
     "caseEvolution_country",
     label    = "Select Countries",
-    choices  = unique(data_evolution$`Country/Region`),
+    choices  = unique(data_evolution$`State`),
     selected = top5_countries,
     multiple = TRUE
   )
@@ -40,11 +40,11 @@ output$selectize_casesByCountries <- renderUI({
 getDataByCountry <- function(countries, normalizeByPopulation) {
   req(countries)
   data_confirmed <- data_evolution %>%
-    select(`Country/Region`, date, var, value, population) %>%
-    filter(`Country/Region` %in% countries &
+    select(`State`, date, var, value, population) %>%
+    filter(`State` %in% countries &
       var == "confirmed" &
       value > 0) %>%
-    group_by(`Country/Region`, date, population) %>%
+    group_by(`State`, date, population) %>%
     summarise("Confirmed" = sum(value)) %>%
     arrange(date)
   if (nrow(data_confirmed) > 0) {
@@ -54,11 +54,11 @@ getDataByCountry <- function(countries, normalizeByPopulation) {
   data_confirmed <- data_confirmed %>% as.data.frame()
 
   data_recovered <- data_evolution %>%
-    select(`Country/Region`, date, var, value, population) %>%
-    filter(`Country/Region` %in% countries &
+    select(`State`, date, var, value, population) %>%
+    filter(`State` %in% countries &
       var == "recovered" &
       value > 0) %>%
-    group_by(`Country/Region`, date, population) %>%
+    group_by(`State`, date, population) %>%
     summarise("Recovered" = sum(value)) %>%
     arrange(date)
   if (nrow(data_recovered) > 0) {
@@ -68,11 +68,11 @@ getDataByCountry <- function(countries, normalizeByPopulation) {
   data_recovered <- data_recovered %>% as.data.frame()
 
   data_deceased <- data_evolution %>%
-    select(`Country/Region`, date, var, value, population) %>%
-    filter(`Country/Region` %in% countries &
+    select(`State`, date, var, value, population) %>%
+    filter(`State` %in% countries &
       var == "deceased" &
       value > 0) %>%
-    group_by(`Country/Region`, date, population) %>%
+    group_by(`State`, date, population) %>%
     summarise("Deceased" = sum(value)) %>%
     arrange(date)
   if (nrow(data_deceased) > 0) {
@@ -92,17 +92,17 @@ output$case_evolution_byCountry <- renderPlotly({
   data <- getDataByCountry(input$caseEvolution_country, input$checkbox_per100kEvolutionCountry)
 
   req(nrow(data$confirmed) > 0)
-  p <- plot_ly(data = data$confirmed, x = ~date, y = ~Confirmed, color = ~`Country/Region`, type = 'scatter', mode = 'lines',
-    legendgroup     = ~`Country/Region`) %>%
-    add_trace(data = data$recovered, x = ~date, y = ~Recovered, color = ~`Country/Region`, line = list(dash = 'dash'),
-      legendgroup  = ~`Country/Region`, showlegend = FALSE) %>%
-    add_trace(data = data$deceased, x = ~date, y = ~Deceased, color = ~`Country/Region`, line = list(dash = 'dot'),
-      legendgroup  = ~`Country/Region`, showlegend = FALSE) %>%
-    add_trace(data = data$confirmed[which(data$confirmed$`Country/Region` == input$caseEvolution_country[1]),],
+  p <- plot_ly(data = data$confirmed, x = ~date, y = ~Confirmed, color = ~`State`, type = 'scatter', mode = 'lines',
+    legendgroup     = ~`State`) %>%
+    add_trace(data = data$recovered, x = ~date, y = ~Recovered, color = ~`State`, line = list(dash = 'dash'),
+      legendgroup  = ~`State`, showlegend = FALSE) %>%
+    add_trace(data = data$deceased, x = ~date, y = ~Deceased, color = ~`State`, line = list(dash = 'dot'),
+      legendgroup  = ~`State`, showlegend = FALSE) %>%
+    add_trace(data = data$confirmed[which(data$confirmed$`State` == input$caseEvolution_country[1]),],
       x            = ~date, y = -100, line = list(color = 'rgb(0, 0, 0)'), legendgroup = 'helper', name = "Confirmed") %>%
-    add_trace(data = data$confirmed[which(data$confirmed$`Country/Region` == input$caseEvolution_country[1]),],
+    add_trace(data = data$confirmed[which(data$confirmed$`State` == input$caseEvolution_country[1]),],
       x            = ~date, y = -100, line = list(color = 'rgb(0, 0, 0)', dash = 'dash'), legendgroup = 'helper', name = "Recovered") %>%
-    add_trace(data = data$confirmed[which(data$confirmed$`Country/Region` == input$caseEvolution_country[1]),],
+    add_trace(data = data$confirmed[which(data$confirmed$`State` == input$caseEvolution_country[1]),],
       x            = ~date, y = -100, line = list(color = 'rgb(0, 0, 0)', dash = 'dot'), legendgroup = 'helper', name = "Deceased") %>%
     layout(
       yaxis = list(title = "# Cases", rangemode = "nonnegative"),
@@ -123,7 +123,7 @@ output$selectize_casesByCountries_new <- renderUI({
   selectizeInput(
     "selectize_casesByCountries_new",
     label    = "Select Country",
-    choices  = c("All", unique(data_evolution$`Country/Region`)),
+    choices  = c("All", unique(data_evolution$`State`)),
     selected = "All"
   )
 })
@@ -132,8 +132,8 @@ output$case_evolution_new <- renderPlotly({
   req(input$selectize_casesByCountries_new)
   data <- data_evolution %>%
     mutate(var = sapply(var, capFirst)) %>%
-    filter(if (input$selectize_casesByCountries_new == "All") TRUE else `Country/Region` %in% input$selectize_casesByCountries_new) %>%
-    group_by(date, var, `Country/Region`) %>%
+    filter(if (input$selectize_casesByCountries_new == "All") TRUE else `State` %in% input$selectize_casesByCountries_new) %>%
+    group_by(date, var, `State`) %>%
     summarise(new_cases = sum(value_new))
 
   if (input$selectize_casesByCountries_new == "All") {
@@ -153,7 +153,7 @@ output$selectize_casesByCountriesAfter100th <- renderUI({
   selectizeInput(
     "caseEvolution_countryAfter100th",
     label    = "Select Countries",
-    choices  = unique(data_evolution$`Country/Region`),
+    choices  = unique(data_evolution$`State`),
     selected = top5_countries,
     multiple = TRUE
   )
@@ -165,8 +165,8 @@ output$case_evolution_after100 <- renderPlotly({
   data <- data_evolution %>%
     arrange(date) %>%
     filter(value >= 100 & var == "confirmed") %>%
-    group_by(`Country/Region`, population, date) %>%
-    filter(if (is.null(input$caseEvolution_countryAfter100th)) TRUE else `Country/Region` %in% input$caseEvolution_countryAfter100th) %>%
+    group_by(`State`, population, date) %>%
+    filter(if (is.null(input$caseEvolution_countryAfter100th)) TRUE else `State` %in% input$caseEvolution_countryAfter100th) %>%
     summarise(value = sum(value)) %>%
     mutate("daysSince" = row_number()) %>%
     ungroup()
@@ -175,7 +175,7 @@ output$case_evolution_after100 <- renderPlotly({
     data$value <- data$value / data$population * 100000
   }
 
-  p <- plot_ly(data = data, x = ~daysSince, y = ~value, color = ~`Country/Region`, type = 'scatter', mode = 'lines') %>%
+  p <- plot_ly(data = data, x = ~daysSince, y = ~value, color = ~`State`, type = 'scatter', mode = 'lines') %>%
     layout(
       yaxis = list(title = "# Cases"),
       xaxis = list(title = "# Days since 100th case")

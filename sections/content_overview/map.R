@@ -2,7 +2,7 @@ library("htmltools")
 
 addLabel <- function(data) {
   data$label <- paste0(
-    '<b>', ifelse(is.na(data$`Province/State`), data$`Country/Region`, data$`Province/State`), '</b><br>
+    '<b>', ifelse(is.na(data$`District`), data$`State`, data$`District`), '</b><br>
     <table style="width:120px;">
     <tr><td>Confirmed:</td><td align="right">', data$confirmed, '</td></tr>
     <tr><td>Deceased:</td><td align="right">', data$deceased, '</td></tr>

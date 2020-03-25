@@ -5,8 +5,8 @@ getFullTableData <- function(groupBy) {
     pivot_wider(names_from = var, values_from = c(value, value_new)) %>%
     select(-date, -Lat, -Long) %>%
     add_row(
-      "Province/State"      = "World",
-      "Country/Region"      = "World",
+      "District"      = "World",
+      "State"      = "World",
       "population"          = 7800000000,
       "value_confirmed"     = sum(.$value_confirmed),
       "value_new_confirmed" = sum(.$value_new_confirmed),
@@ -52,7 +52,7 @@ getFullTableData <- function(groupBy) {
 }
 
 output$fullTable <- renderDataTable({
-  data       <- getFullTableData("Country/Region")
+  data       <- getFullTableData("State")
   columNames <- c(
     "Country",
     "Total Confirmed",
@@ -100,7 +100,7 @@ output$fullTable <- renderDataTable({
     )
   ) %>%
     formatStyle(
-      columns    = "Country/Region",
+      columns    = "State",
       fontWeight = "bold"
     ) %>%
     formatStyle(

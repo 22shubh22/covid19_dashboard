@@ -1,11 +1,11 @@
 output$summaryTables <- renderUI({
   tabBox(
-    tabPanel("Country/Region",
+    tabPanel("State",
       div(
         dataTableOutput("summaryDT_country"),
         style = "margin-top: -10px")
     ),
-    tabPanel("Province/State",
+    tabPanel("District",
       div(
         dataTableOutput("summaryDT_state"),
         style = "margin-top: -10px"
@@ -15,23 +15,23 @@ output$summaryTables <- renderUI({
   )
 })
 
-output$summaryDT_country <- renderDataTable(getSummaryDT(data_atDate(current_date), "Country/Region", selectable = TRUE))
+output$summaryDT_country <- renderDataTable(getSummaryDT(data_atDate(current_date), "State", selectable = TRUE))
 proxy_summaryDT_country  <- dataTableProxy("summaryDT_country")
-output$summaryDT_state   <- renderDataTable(getSummaryDT(data_atDate(current_date), "Province/State", selectable = TRUE))
+output$summaryDT_state   <- renderDataTable(getSummaryDT(data_atDate(current_date), "District", selectable = TRUE))
 proxy_summaryDT_state    <- dataTableProxy("summaryDT_state")
 
 observeEvent(input$timeSlider, {
   data <- data_atDate(input$timeSlider)
-  replaceData(proxy_summaryDT_country, summariseData(data, "Country/Region"), rownames = FALSE)
-  replaceData(proxy_summaryDT_state, summariseData(data, "Province/State"), rownames = FALSE)
+  replaceData(proxy_summaryDT_country, summariseData(data, "State"), rownames = FALSE)
+  replaceData(proxy_summaryDT_state, summariseData(data, "District"), rownames = FALSE)
 }, ignoreInit = TRUE, ignoreNULL = TRUE)
 
 observeEvent(input$summaryDT_country_row_last_clicked, {
   selectedRow     <- input$summaryDT_country_row_last_clicked
-  selectedCountry <- summariseData(data_atDate(input$timeSlider), "Country/Region")[selectedRow, "Country/Region"]
+  selectedCountry <- summariseData(data_atDate(input$timeSlider), "State")[selectedRow, "State"]
   location        <- data_evolution %>%
-    distinct(`Country/Region`, Lat, Long) %>%
-    filter(`Country/Region` == selectedCountry) %>%
+    distinct(`State`, Lat, Long) %>%
+    filter(`State` == selectedCountry) %>%
     summarise(
       Lat  = mean(Lat),
       Long = mean(Long)
@@ -42,10 +42,10 @@ observeEvent(input$summaryDT_country_row_last_clicked, {
 
 observeEvent(input$summaryDT_state_row_last_clicked, {
   selectedRow     <- input$summaryDT_state_row_last_clicked
-  selectedCountry <- summariseData(data_atDate(input$timeSlider), "Province/State")[selectedRow, "Province/State"]
+  selectedCountry <- summariseData(data_atDate(input$timeSlider), "District")[selectedRow, "District"]
   location <- data_evolution %>%
-    distinct(`Province/State`, Lat, Long) %>%
-    filter(`Province/State` == selectedCountry) %>%
+    distinct(`District`, Lat, Long) %>%
+    filter(`District` == selectedCountry) %>%
     summarise(
       Lat  = mean(Lat),
       Long = mean(Long)
