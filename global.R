@@ -12,11 +12,11 @@ source("utils.R", local = T)
 
 downloadGithubData <- function() {
   download.file(
-    url      = "https://github.com/CSSEGISandData/COVID-19/archive/master.zip",
+    url      = "https://github.com/22shubh22/covid-India-test-data/archive/master.zip",
     destfile = "data/covid19_data.zip"
   )
   
-  data_path <- "COVID-19-master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-"
+  data_path <- "covid-India-test-data-master/time_series_19-covid-"
   unzip(
     zipfile   = "data/covid19_data.zip",
     files     = paste0(data_path, c("Confirmed.csv", "Deaths.csv", "Recovered.csv")),
@@ -27,7 +27,7 @@ downloadGithubData <- function() {
 
 
 updateData <- function() {
-  # Download data from Johns Hopkins (https://github.com/CSSEGISandData/COVID-19) if the data is older than 0.5h
+  # Download data from Open Source Data Collection (https://github.com/22shubh22/covid-India-test-data) if the data is older than 0.5h
   if (!dir_exists("data")) {
     dir.create('data')
     downloadGithubData()

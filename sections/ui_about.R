@@ -29,7 +29,7 @@ body_about <- dashboardBody(
               "Medium article"), ".",
             h3("Data"),
             tags$ul(
-              tags$li(tags$b("COVID-19 data:"), tags$a(href = "https://github.com/CSSEGISandData/COVID-19",
+              tags$li(tags$b("COVID-19 data:"), tags$a(href = "https://github.com/22shubh22/covid-India-test-data",
                 "Johns Hopkins CSSE")),
               tags$li(tags$b("Population data:"), tags$a(href = "https://data.worldbank.org/indicator/SP.POP.TOTL",
                 "The World Bank"), "& Wikipedia for countries which are not in World Bank data set.")
